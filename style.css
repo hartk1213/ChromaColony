@@ -1,0 +1,91 @@
+/* Reset and base styles */
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #111;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* Panel container */
+.controls-panel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 230px;
+  background: rgba(20, 20, 20, 0.9);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  font-size: 14px;
+}
+
+/* Section headers */
+.controls-panel h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 4px;
+}
+
+/* Color inputs */
+.color-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.color-input-group label {
+  flex: 1;
+  margin-right: 8px;
+}
+
+.color-input-group input[type="color"] {
+  width: 38px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Radio group styling */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  margin-right: 8px;
+}
+
+.radio-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+  margin-right: 6px;
+}
+
+/* Improve hover/focus effects */
+input[type="color"]:hover,
+input[type="radio"]:hover + .radio-swatch {
+  outline: 2px solid rgba(255,255,255,0.3);
+}
+
+input[type="radio"]:checked + .radio-swatch {
+  outline: 2px solid #4cafef;
+}
+
+
