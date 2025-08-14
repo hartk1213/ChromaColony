@@ -66,7 +66,7 @@ function loadEnvironmentMap(path) {
 
 const hardwareMaterials = {
   blackOxide: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.85, roughness: 0.4 }),
-  stainlessSteel: new THREE.MeshStandardMaterial({ metalness: 0.95, roughness: 0.15, clearcoat: 1.0}),
+  stainlessSteel: new THREE.MeshStandardMaterial({ metalness: 0.95, roughness: 0.15}),
   blackNickel: new THREE.MeshStandardMaterial({ color: 0x222b36, metalness: 0.9, roughness: 0.25 })
 };
 
@@ -130,8 +130,8 @@ function loadModel(url) {
       applyHardwareMaterial(hardwareMaterials[defaultKey]);
     }
 
-    dumpMeshNames();
-    window.model = model; // for debugging
+   // dumpMeshNames();
+  //  window.model = model; // for debugging
   }, undefined, (err) => {
     console.error('GLB load error:', err);
   });
