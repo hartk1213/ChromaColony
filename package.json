@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "postprocessing": "^6.37.7",
+    "realism-effects": "^1.1.2"
+  }
+}

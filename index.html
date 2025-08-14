@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Toolhead Colorizer</title>
+  <style>
+    html, body { margin:0; height:100%; background:#fff; }
+    canvas { display:block; position:fixed; inset:0; }
+    #ui {
+      position:fixed; top:12px; right:12px; z-index:10;
+      background:rgba(255,255,255,0.9); border:1px solid #ddd; border-radius:8px;
+      padding:10px 12px; font-family:system-ui, sans-serif; color:#111
+    }
+    #ui label { display:flex; align-items:center; gap:8px; margin:4px 0; }
+    #ui input[type=color]{ width:40px; height:24px; padding:0; border:0; background:none; }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <label>Primary <input type="color" id="primaryColor" value="#111111" /></label>
+    <label>Accent  <input type="color" id="accentColor"  value="#ffff00" /></label>
+    <label>LED <input type="color" id="clearColor" value="#ffffff" /></label>
+    <label>Frame <input type="color" id="frameColor" value="#1c1c26" /></label>
+    <fieldset id="hardwareColorGroup">
+    <legend>Hardware Color</legend>
+
+    <label>
+    <input type="radio" name="hardwareColor" value="#1c1c26" checked />
+    <span style="display:inline-block;width:20px;height:20px;background:#1c1c26;border:1px solid #ccc;"></span> Black Oxide
+    </label>
+
+  <label>
+    <input type="radio" name="hardwareColor" value="#b5b5b5" />
+    <span style="display:inline-block;width:20px;height:20px;background:#b5b5b5;border:1px solid #ccc;"></span> Stainless
+  </label>
+
+  <label>
+    <input type="radio" name="hardwareColor" value="#001f5c" />
+    <span style="display:inline-block;width:20px;height:20px;background:#001f5c;border:1px solid #ccc;"></span> Black Nickel
+  </label>
+</fieldset>
+  </div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
