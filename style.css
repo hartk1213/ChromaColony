@@ -4,10 +4,10 @@ body {
   font-family: system-ui, sans-serif;
   background: #111;
   color: #fff;
-  overflow: hidden;
+  overflow: hidden; /* desktop default; mobile overrides below */
 }
 
-/* Panel container */
+/* Panel container (desktop defaults) */
 .controls-panel {
   position: absolute;
   top: 20px;
@@ -37,12 +37,7 @@ body {
   justify-content: space-between;
   margin-bottom: 8px;
 }
-
-.color-input-group label {
-  flex: 1;
-  margin-right: 8px;
-}
-
+.color-input-group label { flex: 1; margin-right: 8px; }
 .color-input-group input[type="color"] {
   width: 38px;
   height: 24px;
@@ -53,39 +48,121 @@ body {
 }
 
 /* Radio group styling */
-.radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.radio-option {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.radio-option input[type="radio"] {
-  margin-right: 8px;
-}
-
+.radio-group { display: flex; flex-direction: column; gap: 5px; }
+.radio-option { display: flex; align-items: center; cursor: pointer; }
+.radio-option input[type="radio"] { margin-right: 8px; }
 .radio-swatch {
   display: inline-block;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  border: 1px solid rgba(255,255,255,0.2);
-  margin-right: 6px;
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.2); margin-right: 6px;
 }
 
-/* Improve hover/focus effects */
+/* Hover/focus */
 input[type="color"]:hover,
-input[type="radio"]:hover + .radio-swatch {
-  outline: 2px solid rgba(255,255,255,0.3);
+input[type="radio"]:hover + .radio-swatch { outline: 2px solid rgba(255,255,255,0.3); }
+input[type="radio"]:checked + .radio-swatch { outline: 2px solid #4cafef; }
+
+/* Fullscreen canvas (single, stable rule) */
+canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100svh; /* avoids address-bar jump */
+  display: block;
+  touch-action: none; /* helps OrbitControls on touch */
 }
 
-input[type="radio"]:checked + .radio-swatch {
-  outline: 2px solid #4cafef;
+/* Hide the grabber on desktop */
+.panel-grabber { display: none; }
+/* -------- Mobile-only: bottom sheet + minimize -------- */
+@media (max-width: 640px) {
+  body {
+    overflow: auto; /* allow scroll when sheet is open */
+  }
+
+  .controls-panel {
+    position: fixed;
+    left: 0; right: 0; bottom: 0; top: auto;
+    width: auto;
+    max-height: 70svh;
+    overflow: auto;
+    border-radius: 14px 14px 0 0;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    box-shadow: 0 -6px 24px rgba(0,0,0,.5);
+    font-size: clamp(14px, 3.8vw, 16px);
+    -webkit-overflow-scrolling: touch;
+    background: rgba(20,20,20,0.92);
+    z-index: 10;
+
+    /* Animation */
+    transition: transform 220ms cubic-bezier(.2, .7, .3, 1);
+    will-change: transform;
+  }
+
+  /* When closed, slide down so only grabber is visible */
+  .controls-panel.closed {
+    transform: translateY(calc(100% - 63px));
+  }
+
+  /* Full-width grabber button */
+  .panel-grabber {
+    display: block;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    border: none;
+    border-radius: 8px;
+    margin: 0 0 8px 0;
+    background: rgba(255,255,255,0.08);
+    color: #ccc;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  /* Bigger tap targets */
+  .color-input-group input[type="color"],
+  .radio-option input[type="radio"] {
+    min-width: 20px;
+    min-height: 20px;
+  }
+.screenshot-fab {
+  position: fixed;
+  right: 16px;
+  top: 16px;
+  z-index: 11; 
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  backdrop-filter: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
+.screenshot-fab svg {
+  display: block;
+}
 
+@media (max-width: 640px) {
+  .screenshot-fab {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

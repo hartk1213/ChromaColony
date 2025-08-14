@@ -18,7 +18,14 @@ function initScene() {
   camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 5000);
   camera.position.set(0, 0.5, 2);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  // Cap device pixel ratio for mobile performance (1.25–1.5 is a sweet spot)
+const DPR_CAP = 1.5;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, DPR_CAP));
+
+// Small bump so colors don’t look washed out on phones
+renderer.toneMappingExposure = 0.9; // was 0.5
+ 
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.5;
@@ -176,11 +183,20 @@ function frameModel() {
   controls.update();
 }
 
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+let resizeTO;
+function resize() {
+  if (!renderer || !camera) return; // ← guard until initScene() runs
+  const w = document.documentElement.clientWidth || window.innerWidth;
+  const h = document.documentElement.clientHeight || window.innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+}
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTO);
+  resizeTO = setTimeout(resize, 150);
+}, { passive: true });
+
 
 /* --------------------------------------------------------------------------
  * Component Classification
@@ -279,12 +295,19 @@ function applyCurrentColors() {
 /* --------------------------------------------------------------------------
  * Animation Loop
  * -------------------------------------------------------------------------- */
+let running = true;
+document.addEventListener('visibilitychange', () => {
+  running = document.visibilityState === 'visible';
+}, { passive: true });
+
 function animate() {
-  spotLight.position.set(camera.position.x + 1, camera.position.y + 1, camera.position.z + 1);
-  renderer.render(scene, camera);
-  controls.update();
   requestAnimationFrame(animate);
+  if (!running) return;
+  spotLight.position.set(camera.position.x + 1, camera.position.y + 1, camera.position.z + 1);
+  controls.update();
+  renderer.render(scene, camera);
 }
+
 
 /* --------------------------------------------------------------------------
  * Init
@@ -294,4 +317,61 @@ initLighting();
 loadEnvironmentMap('./assets/hdri/bg.hdr');
 bindHardwareRadioButtons();
 loadModel('./assets/toolhead.glb');
+resize();
+// Mobile-only tap-to-slide bottom sheet
+(function setupMobileSheetToggle() {
+  const panel   = document.getElementById('controls-panel') || document.querySelector('.controls-panel');
+  const grabber = panel?.querySelector('.panel-grabber');
+  if (!panel || !grabber) return;
+
+  const mq = window.matchMedia('(max-width: 640px)');
+
+  function isClosed() {
+    return panel.classList.contains('closed');
+  }
+  function setOpen(open) {
+    panel.classList.toggle('closed', !open);
+    grabber.setAttribute('aria-expanded', String(open));
+    grabber.textContent = open ? 'Hide Controls' : 'Show Controls';
+  }
+  function syncForViewport() {
+    // On desktop, force open and clear any transform
+    if (!mq.matches) {
+      setOpen(true);
+    } else {
+      // Mobile: keep whatever state we had (default to closed on first load)
+      if (!grabber.dataset._init) setOpen(false);
+    }
+    grabber.dataset._init = '1';
+  }
+
+  // Bind click (mobile only)
+  grabber.addEventListener('click', () => {
+    if (!mq.matches) return; // ignore on desktop
+    setOpen(isClosed());
+  }, { passive: true });
+
+  // React to orientation/resize changes
+  (mq.addEventListener ? mq.addEventListener('change', syncForViewport)
+                       : mq.addListener(syncForViewport)); // Safari fallback
+  window.addEventListener('resize', syncForViewport, { passive: true });
+
+  // Initial state
+  syncForViewport();
+})();
+document.getElementById('screenshotFab')?.addEventListener('click', () => {
+  try {
+    const imageDataURL = renderer.domElement.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = imageDataURL;
+    a.download = `ChromaColony-${new Date().toISOString().replace(/[:.]/g,'-')}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (err) {
+    console.error('Screenshot failed:', err);
+  }
+});
+
 animate();
+
