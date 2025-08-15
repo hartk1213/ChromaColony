@@ -256,11 +256,22 @@ const frameInput = document.getElementById('frameColor');
   input.addEventListener('input', applyCurrentColors);
 });
 
-function applyCurrentColors() {
+function applyCurrentColors(doItRight = false) {
   if (!model) return;
+  
+   if (doItRight === true) {
+    primaryInput.value = '#63666a';
+    accentInput.value = '#44d62c';
+    ledInput.value = '#ffffff';
+    frameInput.value = '#333333';
+    doItRight = false;
+  }
+
   const primaryColor = new THREE.Color(primaryInput.value);
   const accentColor = new THREE.Color(accentInput.value);
   const ledColor = new THREE.Color(ledInput.value);
+
+ 
 
   model.traverse((obj) => {
     if (!obj.isMesh) return;
@@ -372,6 +383,14 @@ document.getElementById('screenshotFab')?.addEventListener('click', () => {
     console.error('Screenshot failed:', err);
   }
 });
+
+document.getElementById('doitright')?.addEventListener('click', () => {
+  try {
+   applyCurrentColors(true);
+  } catch (err) {
+  }
+});
+
 
 animate();
 
